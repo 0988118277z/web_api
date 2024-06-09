@@ -33,8 +33,8 @@ async def qrcode_generate(item:QRCodeItem):
     qr.make(fit=True)
     img = qr.make_image()
     
-    current_time = datetime.now()  #取得當前時間
-    formatted_time = current_time.strftime("%Y%m%d-%H%M%S.%f")  #格式化時間
+    current_time = datetime.now()
+    formatted_time = current_time.strftime("%Y%m%d-%H%M%S.%f")
     file_path = f"images/qrcode_{formatted_time}.jpg"
 
     img.save(file_path)

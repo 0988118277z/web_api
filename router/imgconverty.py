@@ -1,4 +1,3 @@
-from typing import Optional
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from enum import Enum
 from fastapi.responses import FileResponse

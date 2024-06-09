@@ -1,20 +1,29 @@
-from pydantic import BaseModel
-from typing import Optional
-from fastapi import APIRouter, status, Response
-from enum import Enum
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from sqly.database import get_db
+from sqly import schemas, crud
 
 router = APIRouter(
-    prefix="/api/v1/account",
-    tags=["Account"],
+    prefix="/api/v1/user",
+    tags=["User"],
 )
 
-class AccountItem(BaseModel):
-    uname: str
-    upasswd: str
-    udescription: Optional[str] = None
-    uage: int
-    uphone: Optional[int] = None
-    
 @router.post("/")
-async def add_account(item: AccountItem):
-    return item
+async def add_user(user: schemas.UserItem, db: Session = Depends(get_db)):
+    check_mail = await crud.check_email(db=db, umail=user.umail)
+    if check_mail:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    else:
+        await crud.add_user(db=db, user=user)
+        return {"detail": "Account create complete"}
+    
+@router.put("/")
+async def passwd_reset(user: schemas.PaaawdChange, db: Session = Depends(get_db)):
+    check_mail = await crud.check_email(db=db, umail=user.umail)
+    if check_mail:
+        await crud.passwd_reset(db=db, user=user)
+        return {"detail": "Password reset complete"}
+    else:
+        raise HTTPException(status_code=400, detail="Email does not exist")
+        
+    
