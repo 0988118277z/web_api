@@ -14,7 +14,7 @@ class Users(Base):
     uphone = Column(String(10), unique=True, nullable=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, onupdate=func.now())
-    is_active = Column(Boolean, default=True)
+    is_active = Column(Boolean, default=False)
 
 class UserSalts(Base):
     __tablename__ = "salts"
@@ -32,5 +32,7 @@ class DnsServer(Base):
     sip = Column(String(length=15))
     uid = Column(Integer, ForeignKey('users.uid'))
     uno = Column(Integer)
+    status = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, onupdate=func.now())
     

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, Field
 from fastapi import APIRouter, Request, HTTPException
 from ipaddress import ip_network, IPv4Address#(不含子遮)
 
@@ -8,7 +8,7 @@ router = APIRouter(
 )
 
 class IPcheck(BaseModel):
-    address: str
+    address: str = Field(..., example="1.2.3.4/5")
     # strict: bool = False  #true=不含子遮, false=含子遮
 
     @validator('address')

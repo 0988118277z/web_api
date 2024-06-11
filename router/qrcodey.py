@@ -18,7 +18,7 @@ class QRCodeItem(BaseModel):
     # error_correction: str = 'L'  #LMHQ
     box_size: int = 10
     border: int = 4
-    text: str = 'web api'
+    text: str = Field('web api', example="your text")
     
 
 @router.post("/")

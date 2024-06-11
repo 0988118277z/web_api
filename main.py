@@ -2,7 +2,7 @@
 #  py -m uvicorn main:app --reload --port 8080
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
-from router import accounty, helloy, imgconverty, qrcodey, ipy
+from router import accounty, helloy, imgconverty, qrcodey, ipy, dnsy
 from sqly import models
 from sqly.database import Base
 from sqly.database import engine
@@ -13,6 +13,7 @@ app.include_router(helloy.router)
 app.include_router(imgconverty.router)
 app.include_router(qrcodey.router)
 app.include_router(ipy.router)
+app.include_router(dnsy.router)
 
 models.Base.metadata.create_all(bind=engine)
 
