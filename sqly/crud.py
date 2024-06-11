@@ -51,19 +51,25 @@ async def show_dns(db: Session, user_id):
     
 async def change_dns(db: Session, dns: schemas.DnsServerChange):
     dns_user = db.query(models.DnsServer).filter_by(uid = dns.uid, uno = dns.uno).first()
-    if dns.sname is not None:
-        dns_user.sname = dns.sname
-    if dns.sip is not None:
-        dns_user.sip = dns.sip
-        
-    db.commit()
-    db.refresh(dns_user)
-    return dns_user
+    if dns_user and dns_user.status == 1:
+        if dns.sname is not None:
+            dns_user.sname = dns.sname
+        if dns.sip is not None:
+            dns_user.sip = dns.sip
+            
+        db.commit()
+        db.refresh(dns_user)
+        return dns_user
+    else:
+        return None
 
 async def delete_dns(db: Session, dns: schemas.DnsServerChange):
     dns_user = db.query(models.DnsServer).filter_by(uid = dns.uid, uno = dns.uno).first()
-    dns_user.status = 0
-        
-    db.commit()
-    db.refresh(dns_user)
-    return dns_user
+    if dns_user:
+        dns_user.status = 0
+            
+        db.commit()
+        db.refresh(dns_user)
+        return dns_user
+    else:
+        return None

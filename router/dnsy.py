@@ -28,14 +28,20 @@ async def add_dns_server(dns: schemas.DnsServerItem, db: Session = Depends(get_d
 async def update_dns_server(dns: schemas.DnsServerChange, db: Session = Depends(get_db)):
     check_user = await crud.check_user(db=db, uid=dns.uid)
     if check_user:
-        await crud.change_dns(db=db, dns=dns)
-        return {"detail": "DNS server update complete"}
+        check_data = await crud.change_dns(db=db, dns=dns)
+        if check_data:
+            return {"detail": "DNS server update complete"}
+        else:
+            raise HTTPException(status_code=400, detail="UID or UNO does not exist")
     raise HTTPException(status_code=400, detail="User does not exist")
 
 @router.delete("/dns_server")
-async def delete_dns_server():
+async def delete_dns_server(dns: schemas.DnsServerDelete, db: Session = Depends(get_db)):
     check_user = await crud.check_user(db=db, uid=dns.uid)
     if check_user:
-        await crud.delete_dns(db=db, dns=dns)
-        return {"detail": "DNS server delete complete"}
+        check_data = await crud.delete_dns(db=db, dns=dns)
+        if check_data:
+            return {"detail": "DNS server delete complete"}
+        else:
+            raise HTTPException(status_code=400, detail="UID or UNO does not exist")
     raise HTTPException(status_code=400, detail="User does not exist")
