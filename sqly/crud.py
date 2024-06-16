@@ -45,8 +45,11 @@ async def add_dns(db: Session, dns: schemas.DnsServerItem):
     db.refresh(db_dns)
     return db_dns
     
-async def show_dns(db: Session, user_id):
-    user_dns_list = db.query(models.DnsServer.uid, models.DnsServer.uno, models.DnsServer.sname, models.DnsServer.sip).filter_by(uid = user_id, status = True).all()
+async def show_dns(db: Session, user_id, uno):
+    if uno is not None:
+        user_dns_list = db.query(models.DnsServer.uid, models.DnsServer.uno, models.DnsServer.sname, models.DnsServer.sip).filter_by(uid = user_id, uno = uno, status = True).all()
+    else:
+        user_dns_list = db.query(models.DnsServer.uid, models.DnsServer.uno, models.DnsServer.sname, models.DnsServer.sip).filter_by(uid = user_id, status = True).all()
     return [ models.DnsServer(uid=item[0], uno=item[1], sname=item[2], sip=item[3]) for item in user_dns_list ]
     
 async def change_dns(db: Session, dns: schemas.DnsServerChange):

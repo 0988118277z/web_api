@@ -2,6 +2,7 @@ from pydantic import BaseModel, validator, Field, root_validator
 from datetime import date, datetime
 from typing import Optional
 from ipaddress import IPv4Address
+from enum import Enum
 
 
 class UserItem(BaseModel):
@@ -46,4 +47,29 @@ class DnsServerChange(BaseModel):
 class DnsServerDelete(BaseModel):
     uid: int = Field(..., example="user_id")
     uno: int = Field(..., example="user_server_number")
+
+class ParserType(Enum):
+    A = 'A'
+    AAAA = 'AAAA'
+    ANY = 'ANY'
+    CAA = 'CAA'
+    CNAME = 'CNAME'
+    MX = 'MX'
+    NAPTR = 'NAPTR'
+    NS = 'NS'
+    PTR = 'PTR'
+    SOA = 'SOA'
+    SRV = 'SRV'
+    TXT = 'TXT'
+   
+class DnsParser(BaseModel):
+    uid: int = Field(..., example="user_id")
+    uno: int | None = Field(None, example="user_server_number")
+    domain: str = Field(..., example="domain")
+    types: ParserType
+    
+    @validator('types')
+    def parser_type_value(cls, v):
+        return v.value
+        
     

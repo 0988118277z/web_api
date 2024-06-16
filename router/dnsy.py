@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqly.database import get_db
 from sqly import schemas, crud
+from modely.dnsrecord import dns_parser
 
 router = APIRouter(
     prefix="/api/v1/dns",
@@ -12,7 +13,7 @@ router = APIRouter(
 async def show_dns_server(db: Session = Depends(get_db), query: schemas.UserId = Depends()):
     check_user = await crud.check_user(db=db, uid=query.uid)
     if check_user:
-        dns_info = await crud.show_dns(db=db, user_id=query.uid)
+        dns_info = await crud.show_dns(db=db, user_id=query.uid, uno=None)
         return dns_info
     raise HTTPException(status_code=400, detail="User does not exist")
     
@@ -44,4 +45,16 @@ async def delete_dns_server(dns: schemas.DnsServerDelete, db: Session = Depends(
             return {"detail": "DNS server delete complete"}
         else:
             raise HTTPException(status_code=400, detail="UID or UNO does not exist")
+    raise HTTPException(status_code=400, detail="User does not exist")
+
+@router.get("/parser")
+async def nslookup (query: schemas.DnsParser = Depends(), db: Session = Depends(get_db)):
+    check_user = await crud.check_user(db=db, uid=query.uid)
+    if check_user:
+        dns_info = await crud.show_dns(db=db, user_id=query.uid, uno=query.uno)
+        sname_list = [ i.sname for i in dns_info ]
+        sip_list = [ i.sip for i in dns_info ]
+        
+        result = await dns_parser(query.domain, query.types, sname_list, sip_list)
+        return result
     raise HTTPException(status_code=400, detail="User does not exist")
