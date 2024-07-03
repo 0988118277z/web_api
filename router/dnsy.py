@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqly.database import get_db
 from sqly import schemas, crud
-from modely.dnsrecord import dns_parser
+from moduley.dnsrecord import dns_parser
 
 router = APIRouter(
     prefix="/api/v1/dns",
@@ -10,7 +10,7 @@ router = APIRouter(
 )
 
 @router.get("/dns_server")
-async def show_dns_server(db: Session = Depends(get_db), query: schemas.UserId = Depends()):
+async def show_dns_server(query: schemas.UserId = Depends(), db: Session = Depends(get_db)):
     check_user = await crud.check_user(db=db, uid=query.uid)
     if check_user:
         dns_info = await crud.show_dns(db=db, user_id=query.uid, uno=None)

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validator, Field, root_validator
+from pydantic import BaseModel, validator, Field, ValidationError
 from datetime import date, datetime
 from typing import Optional
 from ipaddress import IPv4Address
@@ -19,13 +19,23 @@ class PaaawdChange(BaseModel):
 class UserId(BaseModel):
     uid: int = Field(..., example="user_id")
 
+class AddressV4(BaseModel):
+    iip : str = Field(..., example="ipv4")
+
+    @validator('iip')
+    def validate_ipv4_network(cls, v):
+        try:
+            return str(IPv4Address(v))
+        except:
+            return False
+
 class DnsServerItem(BaseModel):
     sname: str = Field(..., example="dns_server_name")
     sip: str = Field(..., example="dns_server_ip")
     uid: int = Field(..., example="user_id")
     
     @validator('sip')
-    def validate_ipv4_network(cls, v, values):
+    def validate_ipv4_network(cls, v):
         try:
             return str(IPv4Address(v))
         except ValueError as e:

@@ -1,6 +1,8 @@
 from pydantic import BaseModel, validator, Field
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, Depends
 from ipaddress import ip_network, IPv4Address#(不含子遮)
+from moduley.geoipy import iplookup
+from sqly import schemas
 
 router = APIRouter(
     prefix="/api/v1/ipv4",
@@ -19,11 +21,21 @@ class IPcheck(BaseModel):
         except ValueError as e:
             raise ValueError(f"{v} does not appear to be an IPv4 network")
 
-@router.get("/ip-get")
-async def get_ip(request: Request):
-    client_host = request.client.host
-    # client_port = request.client.port
-    return {'ip':request.client.host}
+@router.get("/ip-getinfo")
+async def get_ip_info(ipaddress: schemas.AddressV4 = Depends()):
+    # client_host = request.client.host
+    # client_port = request.client.port   
+    if ipaddress.iip:
+        return await iplookup(ipaddress.iip)
+    else:
+        return f"input does not appear to be an IPv4 network"
+
+@router.get("/ip-myinfo")
+async def request_ip_info(request: Request):
+    try:
+        return await iplookup(request.client.host)
+    except:
+        return f'{request.client.host} is not public'
     
 @router.post("/ip-compute")
 async def compute_ip(ip: IPcheck):
@@ -81,7 +93,6 @@ async def compute_ip(ip: IPcheck):
                 ip_address['available_ip_amount'] = (broadcast-networkname+1)-2
         
     return ip_address
-
 
 
 # 在 FastAPI 中，Request 物件來自 Starlette 框架，包含了許多屬性和方法，使得你能夠訪問和處理 HTTP 請求的各種數據。以下是一些你可以從 Request 物件中訪問的重要屬性和方法：
